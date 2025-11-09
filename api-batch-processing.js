@@ -7,6 +7,8 @@ async function transcribe(fileUrl) {
     model: "nova-3",
     smart_format: "true",
     diarize: "true",
+    summarize: "true", // <- add summary
+    sentiment: "true", // <- add sentiment
   });
 
   const options = {
@@ -54,6 +56,18 @@ async function transcribe(fileUrl) {
 
       const audioSec = data?.metadata?.duration ?? null; // ← audio length (seconds)
 
+      // Try to find a summary text (handle a couple of shapes safely)
+      const summary =
+        data?.results?.summary?.text ??
+        data?.results?.summary ??
+        data?.summary?.text ??
+        data?.summary ??
+        null;
+
+      // Try to find sentiment (common shapes: top-level or per-alternative)
+      const alt = data?.results?.channels?.[0]?.alternatives?.[0];
+      const sentiment = data?.results?.sentiment ?? alt?.sentiment ?? null;
+
       return {
         url: fileUrl,
         success: true,
@@ -65,6 +79,14 @@ async function transcribe(fileUrl) {
           data?.results?.channels?.[0]?.alternatives?.[0]?.words?.slice(0, 3) ??
           [],
         raw: data, // keep for debugging if you want
+        summary:
+          typeof summary === "string"
+            ? summary
+            : JSON.stringify(summary ?? "N/A").slice(0, 200),
+        sentiment:
+          typeof sentiment === "string"
+            ? sentiment
+            : JSON.stringify(sentiment ?? "N/A").slice(0, 200),
       };
     } catch (error) {
       if (attempt < 2) {
@@ -168,6 +190,9 @@ const fileUrls = [
         0
       )} seconds audio → processed in ${wall.toFixed(1)}s`
     );
+    // Print short summary/sentiment lines
+    console.log(`   Summary:   ${r.summary ?? "N/A"}`);
+    console.log(`   Sentiment: ${r.sentiment ?? "N/A"}\n`);
   });
 
   console.log(`Average processing time per file: ${avgTime.toFixed(0)} ms`);

@@ -11,8 +11,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // === Config (adjust as you like) ============================================
+// const AUDIO_PATH = path.resolve(
+//   "/Users/evangelos/Downloads/ttsMP3.com_VoiceText_2025-11-8_17-22-44.wav"
+// );
 const AUDIO_PATH = path.resolve(
-  "/Users/evangelos/Downloads/ttsMP3.com_VoiceText_2025-11-8_17-22-44.wav"
+  "/Users/evangelos/Downloads/luvvoicecom-20251109-kkurty_trnsy4pS.wav"
 );
 const CHUNK_SIZE = 8_192; // bytes per chunk (simulate "live" network audio)
 const CHUNK_INTERVAL_MS = 20; // pacing to feel real-time-ish
